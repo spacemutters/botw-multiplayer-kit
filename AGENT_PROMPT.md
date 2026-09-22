@@ -69,11 +69,12 @@ Use `C:\BOTWMP` as the install root unless I say otherwise.
    - Backspace: −
 
    If I have a gamepad, set it up in Cemu's Options > Input settings instead.
-8. **A save past the starting shrine.** The mod crashes if the save is still inside the Shrine of Resurrection (its log repeats "Could not find map pin address", then Cemu closes). If I don't have such a save, launch Cemu directly: `C:\BOTWMP\Cemu\Cemu.exe -g "<Game folder>\code\U-King.rpx"`, *not* through the launcher. Let me play until I've walked out of the shrine and the game autosaves.
+8. **A save past the starting shrine.** The mod's guide requires it. If I don't have such a save, launch Cemu directly: `C:\BOTWMP\Cemu\Cemu.exe -g "<Game folder>\code\U-King.rpx"`, *not* through the launcher. Let me play until I've walked out of the shrine, then save from the System menu.
 9. **Radmin VPN.** Download the installer from https://www.radmin-vpn.com/ and check that it's signed by Famatech. I approve the UAC prompt. In Radmin VPN: Network > Join existing network, using the name and password above. Confirm Davis shows up online in the list.
 10. **Launcher.**
     - Start `C:\BOTWMP\MilkBarLauncher\Milk Bar Launcher.exe` once. It creates `%APPDATA%\BOTWM\*`; check the MSIX gotcha. Let me type my player name. It asks for one while the name is "Link".
     - Click **Add Server**: any name, IP `<<HOST IP>>`, port `5050`, password blank.
+    - **REQUIRED before every Connect:** start the kit's crash fix and leave it running: `python setup\mp_pinfix.py --loop 600` (any Python 3, no packages). Without it the mod crashes Cemu about 2 minutes after connecting. This is a bug in the mod on this build, proven on Davis's PC; details in README.md. Check `setup\mp_pinfix.log` shows "patched 32 marker records" and "planted terminator" after the game loads.
     - Once Davis's server is running, the entry shows a player count and ping. Then click **Connect**. The launcher starts Cemu, injects the mod, and opens the game.
 11. **Verify it actually works.** Report each of these to me:
     - The server entry shows a ping, not an error.
@@ -86,6 +87,7 @@ Use `C:\BOTWMP` as the install root unless I say otherwise.
 - **"The given key 'store_dir' was not present in the dictionary"**: BCML's settings.json is missing keys. Re-run `bcml_setup.py`, which saves BCML's full settings.
 - **"The following needed graphic packs are not selected on Cemu"**: settings.xml is missing the `bcmlPatches\MilkBarLauncher` or `ExtendedMemory` entry (backslashes, relative paths), or Cemu rewrote it. Re-copy the template.
 - **"Mod is not setup on BCML"**: `%LOCALAPPDATA%\bcml\merged\content\Actor\Pack` is missing. Re-run `bcml_setup.py`, then check the MSIX gotcha.
+- **Cemu closes ~2 minutes after connecting** (mod log repeats "Could not find map pin address", or Cemu's log.txt shows an exception in InjectDLL.dll): `mp_pinfix.py` wasn't running. Start it, then Connect again.
 - **Cemu opens with no sound**: `<TVDevice>` is empty. It must be `default`.
 - **Cemu wants to update**: say no. It must stay 1.26.2.
 - **Can't see Davis's server**: both machines must be online in the same Radmin network, and Davis's server must be running. Ping `<<HOST IP>>`.
