@@ -142,5 +142,19 @@ def main():
     return 0
 
 
+def loop_forever():
+    """--loop: patch every Cemu that appears, for as long as this process lives."""
+    while True:
+        pid = cemu_pid()
+        if not pid:
+            time.sleep(2); continue
+        main()
+        while cemu_pid() == pid:
+            time.sleep(3)
+
+
 if __name__ == "__main__":
+    if "--loop" in sys.argv:
+        sys.argv = [a for a in sys.argv if a != "--loop"]
+        loop_forever()
     sys.exit(main())
