@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Cemu 1.26.2 settings for the Milk Bar multiplayer mod. Replace GAME_FOLDER with the folder that
+     CONTAINS the BotW game folder. Cemu fills in every other setting on first start.
+     - check_update=false: updating Cemu past 1.26.2 breaks the mod.
+     - Graphic pack paths: relative, backslashes, exactly as BCML writes them. The launcher refuses to
+       connect unless bcmlPatches\MilkBarLauncher and ExtendedMemory are listed here.
+     - TVDevice "default": an empty TVDevice means NO sound.
+     - IntelShadows only activates on Intel GPUs; FPS++ locked to 30 keeps players in sync. -->
+<content>
+    <check_update>false</check_update>
+    <vk_warning>true</vk_warning>
+    <gp_download>true</gp_download>
+    <GamePaths>
+        <Entry>GAME_FOLDER</Entry>
+    </GamePaths>
+    <GraphicPack>
+        <Entry filename="graphicPacks\BreathOfTheWild_BCML\rules.txt">
+            <preset></preset>
+        </Entry>
+        <Entry filename="graphicPacks\bcmlPatches\MilkBarLauncher\rules.txt">
+            <preset></preset>
+        </Entry>
+        <Entry filename="graphicPacks\downloadedGraphicPacks\BreathOfTheWild\Mods\ExtendedMemory\rules.txt">
+            <preset></preset>
+        </Entry>
+        <Entry filename="graphicPacks\downloadedGraphicPacks\BreathOfTheWild\!Override\IntelShadows\rules.txt">
+            <preset></preset>
+        </Entry>
+        <Entry filename="graphicPacks\downloadedGraphicPacks\BreathOfTheWild\Mods\FPS++\rules.txt">
+            <Preset>
+                <category>FPS Limit</category>
+                <preset>30FPS Limit</preset>
+            </Preset>
+        </Entry>
+    </GraphicPack>
+    <Graphic>
+        <api>1</api>
+        <AsyncCompile>true</AsyncCompile>
+    </Graphic>
+    <Audio>
+        <api>0</api>
+        <TVVolume>50</TVVolume>
+        <TVDevice>default</TVDevice>
+    </Audio>
+</content>
