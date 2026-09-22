@@ -96,8 +96,18 @@ def main():
         time.sleep(3)
     else:
         log("gave up waiting for markers"); return 1
-    stride_ok = all(b - a == 0x40 for a, b in zip(hits, hits[1:]))
-    log("found %d markers at %#x (stride 0x40: %s)" % (len(hits), hits[0], stride_ok))
+    hits.sort()
+    # the real table is 32 records exactly 0x40 apart; anything after that is a stopper we planted earlier
+    records = [hits[0]]
+    for a in hits[1:]:
+        if a - records[-1] == 0x40 and len(records) < 32:
+            records.append(a)
+    extra = [a for a in hits if a not in records]
+    log("found %d records at %#x (complete table: %s), %d extra copies after it" % (len(records), records[0], len(records) == 32, len(extra)))
+    if len(records) < 32:
+        log("table incomplete; not touching memory"); return 2
+    hits = records
+    stopper_exists = any(a > hits[-1] for a in extra)
     patched = 0
     for a in hits:
         cur = ctypes.create_string_buffer(1); got = ctypes.c_size_t()
@@ -116,6 +126,8 @@ def main():
     # crashes (access violation ~30 s later). Plant one terminator copy in the first zero-filled
     # gap after the table so the loop stops there. Nothing ever writes to that 33rd address.
     last = hits[-1]
+    if stopper_exists:
+        log("stopper already present after the table; nothing more to do"); return 0
     after = ctypes.create_string_buffer(0x40); got = ctypes.c_size_t()
     k32.ReadProcessMemory(h, ctypes.c_void_p(last + 0x40), after, 0x40, ctypes.byref(got))
     log("bytes after the last record: %s" % after.raw[:got.value].hex(" "))
