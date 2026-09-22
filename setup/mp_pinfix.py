@@ -47,6 +47,17 @@ def cemu_pid():
     return None
 
 
+def cemu_pids():
+    out = subprocess.run(["tasklist", "/FI", "IMAGENAME eq Cemu.exe", "/FO", "CSV", "/NH"], capture_output=True, text=True,
+                         creationflags=0x08000000).stdout
+    pids = []
+    for line in out.splitlines():
+        parts = line.strip().strip('"').split('","')
+        if len(parts) > 1 and parts[1].isdigit():
+            pids.append(int(parts[1]))
+    return pids
+
+
 def big_regions(h):
     addr, m = 0, MBI()
     while addr < 0x7FFFFFFFFFFF and k32.VirtualQueryEx(h, ctypes.c_void_p(addr), ctypes.byref(m), ctypes.sizeof(m)):
@@ -74,10 +85,9 @@ def find_markers(h):
     return hits
 
 
-def main():
+def main(pid=None):
     wait = float(sys.argv[1]) if len(sys.argv) > 1 else 300
     t0 = time.time()
-    pid = None
     while time.time() - t0 < wait and not pid:
         pid = cemu_pid()
         if not pid:
@@ -97,11 +107,23 @@ def main():
     else:
         log("gave up waiting for markers"); return 1
     hits.sort()
-    # the real table is 32 records exactly 0x40 apart; anything after that is a stopper we planted earlier
-    records = [hits[0]]
-    for a in hits[1:]:
-        if a - records[-1] == 0x40 and len(records) < 32:
-            records.append(a)
+    # the real table is 32 records exactly 0x40 apart, wherever it sits among any stray copies of the
+    # pattern; a copy right after it is a stopper we planted earlier
+    records = []
+    for start in range(len(hits)):
+        run = [hits[start]]
+        for a in hits[start + 1:]:
+            if a - run[-1] == 0x40:
+                run.append(a)
+                if len(run) == 32:
+                    break
+            elif a - run[-1] > 0x40:
+                break
+        if len(run) == 32:
+            records = run
+            break
+    if not records:
+        records = hits[:1]
     extra = [a for a in hits if a not in records]
     log("found %d records at %#x (complete table: %s), %d extra copies after it" % (len(records), records[0], len(records) == 32, len(extra)))
     if len(records) < 32:
@@ -155,14 +177,16 @@ def main():
 
 
 def loop_forever():
-    """--loop: patch every Cemu that appears, for as long as this process lives."""
+    """--loop: patch every Cemu that appears (each in its own thread), for as long as this process lives."""
+    import threading
+    handled = set()
     while True:
-        pid = cemu_pid()
-        if not pid:
-            time.sleep(2); continue
-        main()
-        while cemu_pid() == pid:
-            time.sleep(3)
+        live = set(cemu_pids())
+        handled &= live  # forget games that closed
+        for pid in live - handled:
+            handled.add(pid)
+            threading.Thread(target=main, args=(pid,), daemon=True).start()
+        time.sleep(2)
 
 
 if __name__ == "__main__":

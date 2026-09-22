@@ -18,8 +18,10 @@ Not included on purpose:
 
 On this game build the mod's InjectDLL crashes Cemu about two minutes after connecting: its "map pin" memory scan never matches (log: `Could not find map pin address`), and a second unbounded scan then runs off the end of Cemu's memory (access violation in InjectDLL.dll). `mp_pinfix.py` fixes both from outside, at runtime, without modifying the mod: it waits for Cemu, patches one byte in each of the 32 player marker records so the scan matches, and plants a stopper copy of the pattern after the table.
 
-Run it with any Python 3 (no packages needed) **right before clicking Connect** in the launcher, and leave it running:
+Run it with any Python 3 (no packages needed) **before clicking Connect** in the launcher, and leave it running for the whole session:
 
-    python setup\mp_pinfix.py 300
+    python setup\mp_pinfix.py --loop 600
 
-It exits by itself once patched (log in `mp_pinfix.log` next to the script). Start it again for every new Connect.
+It patches every game window that appears (log in `mp_pinfix.log` next to the script), so one run covers reconnects too.
+
+Don't test Davis's server by opening a bare connection to port 5050 (for example `Test-NetConnection -Port 5050`). The stock server crashed on that; Davis's copy is now fixed, but the launcher's server list is the right way to check it.
