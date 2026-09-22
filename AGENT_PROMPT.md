@@ -39,7 +39,7 @@ The Claude desktop app is an MSIX package. When a process you launch creates a *
 ## Steps
 Use `C:\BOTWMP` as the install root unless I say otherwise.
 
-1. **Find my BotW files.** The folder form has `code\`, `content\`, and `meta\` inside each title. Confirm:
+1. **Find my BotW files.** (No files yet? Do `GAME_FILES.md` first.) The folder form has `code\`, `content\`, and `meta\` inside each title. Confirm:
    - base: `...\content\Pack\Dungeon000.pack` exists
    - update: `...\meta\meta.xml` has `<title_version>` **208**
    - DLC: `...\content\0010\Pack\AocMainField.pack` exists
