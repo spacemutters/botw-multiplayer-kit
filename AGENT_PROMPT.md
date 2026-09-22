@@ -14,7 +14,7 @@ Davis's server details (from Davis, keep private):
 ## Rules
 - Download only from the official sources below. Verify every SHA-256 before extracting. Stop and tell me if a hash does not match.
 - Do not change system or security settings yourself. When Windows asks for admin permission (UAC) or shows a firewall prompt, tell me what to click. I click it.
-- Game files: I must already have my own copy of BotW in folder form (see step 1). Do not download the game for me. If I don't have it, stop and tell me.
+- Game files: I need my own copy of BotW in folder form (see step 1). If I don't have it, follow `GAME_FILES.md`: you set up the downloader, I click Download.
 - Plain language when you talk to me. Verify each step before moving on. "The file exists" is not "it works".
 
 ## Versions must match Davis exactly
